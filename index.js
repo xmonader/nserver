@@ -4,6 +4,17 @@ var fs = require("fs");
 var path = require("path");
 var hb = require('handlebars');
 
+
+//EXIT CODES:
+// 3: Can't access the static directory.
+staticdir = process.argv[2] || process.cwd() + path.sep+ "files";
+fs.exists(staticdir, (exists) => {
+	if (!exists){
+		console.log("Specify valid static directory.");
+		process.exit(3);	
+	}
+});
+
 var mimetypes = {
 	".html": "text/html",
 	".txt": "text/plain",
@@ -17,7 +28,16 @@ var mimetypes = {
 http.createServer(function (req, res) {
 	res.writeHead(200, { 'Content-Type': 'text/plain' });
 	var uri = url.parse(req.url).pathname;
-	var fileName = path.join(process.cwd() + unescape(uri));
+	if (uri == "/"){
+		uri = staticdir;
+	}
+	if (uri.indexOf("..") > 0){ //Don't allow relative paths.
+		res.writeHead(500, {"Content-Type":"text/plain"});
+		res.write("500 Internal server error.");
+		res.end();
+		return;
+	}
+	var fileName = uri;
 	try {
 		var stats = fs.lstatSync(fileName);
 	} catch (e) {
@@ -37,12 +57,10 @@ http.createServer(function (req, res) {
 		var entries = [];
 		fs.readdir(fileName, function (err, files) {
 			files.forEach(function (file) {
-				var fullname = fileName + path.sep + file;
+				var fullname =  uri + path.sep + file;
 				var st = fs.lstatSync(fullname);
-				// filelink PATH/TO/files/FILE/PATH
-				// remove PATH/TO PART and replace it with localhost:3002/files
-				var regex = RegExp(".+?/files");
-				var link = fullname.replace(regex, "http://" + req.headers["host"] + "/files");
+				var regex = RegExp(`.+?/${staticdir}`);
+				var link = fullname.replace(regex, "http://" + req.headers["host"] + `${staticdir}`);
 
 				var ent = { "fullname": fullname, "isFile": st.isFile(), "size": st.size, "filename": path.basename(fullname), "link": link };
 				entries.push(ent);
