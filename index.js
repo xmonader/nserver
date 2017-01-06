@@ -31,7 +31,7 @@ http.createServer(function (req, res) {
 	if (uri == "/"){
 		uri = staticdir;
 	}
-	if (uri.indexOf("..") > 0){ //Don't allow relative paths.
+	if (uri.indexOf("..") > 0 || ! uri.startsWith(staticdir)){ //Don't allow relative paths.
 		res.writeHead(500, {"Content-Type":"text/plain"});
 		res.write("500 Internal server error.");
 		res.end();
@@ -39,6 +39,7 @@ http.createServer(function (req, res) {
 	}
 	var fileName = uri;
 	try {
+		
 		var stats = fs.lstatSync(fileName);
 	} catch (e) {
 		console.log("Error accessing resource " + fileName)
