@@ -12,6 +12,6 @@ node index.js
 ```
 
 
-> I wrote to learn about node.js
+> I wrote it to learn about node.js
 
 Thanks for checking out the project. 
