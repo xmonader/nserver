@@ -1,0 +1,13 @@
+<html>
+    <table>
+        <th>Name</th><th>Type<th>Size</th>
+        {{#each entries}}
+            <tr>
+                <td><a href="{{link}}">{{filename}}</a></td>
+                <td>{{isFile}}</td>
+                <td>{{size}}</td>
+            </tr>
+        {{/each}}
+    </table>
+
+</html>
