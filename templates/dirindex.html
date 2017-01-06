@@ -1,4 +1,5 @@
 <html>
+    {{# if entries.length}}
     <table>
         <th>Name</th><th>Type<th>Size</th>
         {{#each entries}}
@@ -9,5 +10,8 @@
             </tr>
         {{/each}}
     </table>
+    {{else}}
+    <h1>Empty directory.</h1>
+    {{/if}}
 
 </html>
