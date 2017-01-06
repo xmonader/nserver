@@ -38,17 +38,17 @@ http.createServer(function (req, res) {
 		return;
 	}
 	var fileName = uri;
-	try {
-		
-		var stats = fs.lstatSync(fileName);
-	} catch (e) {
-		console.log("Error accessing resource " + fileName)
-		res.writeHead(404, { "Content-Type": "text/plain" });
-		res.write("404 not found.\n");
-		res.end()
-		return;
-	}
-	// file or dir.
+	fs.lstat(fileName, (err, stats) => {
+
+
+		if (err){
+			console.log("Error accessing resource " + fileName)
+			res.writeHead(404, { "Content-Type": "text/plain" });
+			res.write("404 not found.\n");
+			res.end()
+			return;
+		}
+		// file or dir.
 	if (stats.isFile()) {
 		var mimetype = mimetypes[path.extname(fileName)];
 		res.writeHead(200, { "Content-Type": mimetype });
@@ -78,6 +78,7 @@ http.createServer(function (req, res) {
 		res.write("500 Internal Error.")
 		res.end();
 	}
+	});
 }).listen(3002);
 
 console.log('Server started...')
